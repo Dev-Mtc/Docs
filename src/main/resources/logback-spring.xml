@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_DIR"       value="${LOG_DIR:-/var/log/sandre}"/>
+    <property name="LOG_BASENAME"  value="${LOG_BASENAME:-sandre-sync-batch}"/>
+    <property name="LOG_MAX_HISTORY" value="${LOG_MAX_HISTORY:-30}"/>
+
+    <!-- Console : utile en dev/debug, format texte simple. -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{40} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Fichier JSON destiné à être collecté par Filebeat/Fluent Bit puis envoyé vers Kibana. -->
+    <appender name="FILE_JSON" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_BASENAME}.json</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_DIR}/${LOG_BASENAME}.%d{yyyy-MM-dd}.json.gz</fileNamePattern>
+            <maxHistory>${LOG_MAX_HISTORY}</maxHistory>
+        </rollingPolicy>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdc>true</includeMdc>
+            <includeContext>false</includeContext>
+            <customFields>{"application":"sandre-sync-batch"}</customFields>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE_JSON"/>
+    </root>
+
+</configuration>

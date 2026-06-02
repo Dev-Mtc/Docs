@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: sandre-sync-batch
+
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/sandre}
+    username: ${DB_USER:sandre}
+    password: ${DB_PASSWORD:sandre}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX:5}
+      minimum-idle: 1
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 100
+          time_zone: UTC
+        order_inserts: true
+        order_updates: true
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: true
+
+sandre:
+  base-url: ${SANDRE_BASE_URL:https://api.sandre.eaufrance.fr/referentiels/v1}
+  page-size: ${SANDRE_PAGE_SIZE:1000}
+  timeout: ${SANDRE_TIMEOUT:60s}
+  max-in-memory-size-mb: ${SANDRE_MAX_IN_MEMORY_MB:64}
+
+logging:
+  level:
+    root: INFO
+    fr.brgm.sandre: ${LOG_LEVEL_APP:INFO}
+    org.springframework.batch: INFO
+    org.hibernate.SQL: WARN
